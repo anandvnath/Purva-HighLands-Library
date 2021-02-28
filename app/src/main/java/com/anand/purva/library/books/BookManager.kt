@@ -2,7 +2,7 @@ package com.anand.purva.library.books
 
 import android.app.Application
 import android.util.Log
-import com.opencsv.CSVReader
+import de.siegmar.fastcsv.reader.CsvReader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -24,9 +24,8 @@ class BookManager(scope: CoroutineScope, private val application: Application) {
 
     private fun loadBooks() {
         val bufferedReader = application.assets.open("lib-data.csv").bufferedReader()
-        val reader = CSVReader(bufferedReader)
-        reader.readAll().forEach { row ->
-            books.add(Book(row[0], row[1], row[2]))
+        CsvReader.builder().build(bufferedReader).forEach { row ->
+            books.add(Book(row.getField(0), row.getField(1), row.getField(2)))
         }
         Log.d("LibApp", "Books loaded: ${books.size}")
     }
