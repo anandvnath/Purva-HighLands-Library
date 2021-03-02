@@ -17,4 +17,5 @@
     <string name="menu_title">Title</string>
     <string name="menu_author">Author</string>
     <string name="menu_category">Category</string>
+    <string name="book_category">Category</string>
 </resources>

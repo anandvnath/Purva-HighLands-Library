@@ -26,6 +26,6 @@ class BookViewAdapter : RecyclerView.Adapter<BookItemViewHolder>() {
         val item = data[position]
         holder.bookAuthor.text = item.author
         holder.bookName.text = item.title
+        holder.bookCategory.text = item.category
     }
-
 }

@@ -3,15 +3,18 @@ package com.anand.purva.library.books
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
+import androidx.core.view.iterator
 import androidx.fragment.app.activityViewModels
 import com.anand.purva.library.R
 import com.anand.purva.library.databinding.FragmentSearchResultBinding
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -21,6 +24,7 @@ class BookSearchResultFragment : Fragment() {
     private lateinit var binding: FragmentSearchResultBinding
     private var searchResult: SearchResult? = null
     private val adapter = BookViewAdapter()
+    private lateinit var navView: BottomNavigationView
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +40,7 @@ class BookSearchResultFragment : Fragment() {
 
         binding.searchResultsView.adapter = adapter
         binding.searchResultsView.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.HORIZONTAL))
-        val navView = binding.navView
+        navView = binding.navView
         navView.setOnNavigationItemSelectedListener { menu ->
             displayResults(menu.itemId)
             true
@@ -47,15 +51,39 @@ class BookSearchResultFragment : Fragment() {
         })
     }
 
+    private fun updateBadges() {
+        navView.menu.iterator().forEach { menuItem ->
+            val badgeCount = getBadgeCount(menuItem)
+            val badge = navView.getOrCreateBadge(menuItem.itemId)
+            badge.isVisible = true
+            badge.number = badgeCount
+        }
+    }
+
+    private fun getBadgeCount(menuItem: MenuItem): Int {
+        searchResult?.let {
+            return when (menuItem.itemId) {
+                R.id.action_author -> it.authorsBooks.size
+                R.id.action_title -> it.titleBooks.size
+                R.id.action_category -> it.categoryBooks.size
+                R.id.action_all -> it.authorsBooks.size + it.titleBooks.size + it.categoryBooks.size
+                else -> 0
+            }
+        }
+        return 0;
+    }
+
+
     private fun displayResults(@IdRes selection: Int) {
         searchResult?.let {
             when (selection) {
-                R.id.action_author -> adapter.data = mutableSetOf(it.authorsBooks).flatten()
-                R.id.action_title -> adapter.data = mutableSetOf(it.titleBooks).flatten()
-                R.id.action_category -> adapter.data = mutableSetOf(it.categoryBooks).flatten()
-                else -> adapter.data = mutableSetOf(it.authorsBooks, it.titleBooks, it.categoryBooks).flatten().sortedBy { it.title }
+                R.id.action_author -> adapter.data = mutableSetOf(it.authorsBooks).flatten().sortedBy { it.author }
+                R.id.action_title -> adapter.data = mutableSetOf(it.titleBooks).flatten().sortedBy { it.title }
+                R.id.action_category -> adapter.data = mutableSetOf(it.categoryBooks).flatten().sortedBy { it.category }
+                R.id.action_all -> adapter.data = mutableSetOf(it.authorsBooks, it.titleBooks, it.categoryBooks).flatten().sortedBy { it.title }
             }
         }
-
+        updateBadges()
     }
 }
+

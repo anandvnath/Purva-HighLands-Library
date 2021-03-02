@@ -22,7 +22,7 @@
         android:id="@+id/nav_view"
         android:layout_width="match_parent"
         android:layout_height="64dp"
-        app:labelVisibilityMode="auto"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
