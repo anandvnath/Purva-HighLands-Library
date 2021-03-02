@@ -11,12 +11,14 @@ import kotlinx.coroutines.launch
 
 class BookViewModel(application: Application) : ViewModel() {
     val searchResult = MutableLiveData<SearchResult>()
-    val bookManager = BookManager(viewModelScope, application)
-    init {
-        viewModelScope.launch {
+    val bookManager = BookManager(viewModelScope, application, this::callback)
+
+    private fun callback(done: Boolean) {
+        if (done) {
             searchResult.postValue(bookManager.allBooks)
         }
     }
+
     fun onQuery(query: String) {
         viewModelScope.launch {
             if (query.length > 2) {

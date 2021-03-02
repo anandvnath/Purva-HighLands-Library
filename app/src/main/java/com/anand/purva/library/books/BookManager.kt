@@ -4,19 +4,21 @@ import android.app.Application
 import android.util.Log
 import de.siegmar.fastcsv.reader.CsvReader
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class BookManager(scope: CoroutineScope, private val application: Application) {
+class BookManager(scope: CoroutineScope, private val application: Application, callback: (b: Boolean) -> Unit) {
     private val books = mutableListOf<Book>()
     lateinit var  allBooks: SearchResult
     private val trie = BookTrie()
 
     init {
-        scope.launch {
+        scope.launch(Dispatchers.Main) {
             loadBooks()
             books.forEach { trie.insert(it) }
             allBooks = SearchResult(books)
+            callback(true)
         }
     }
 
@@ -105,9 +107,6 @@ private class BookTrie {
         if (k == key.length) {
             return null
         }
-        if (key.startsWith("har")) {
-            println("Inserting $key")
-        }
         val currChar = key[k]
         var newNode: BookTrieNode? = node
         if (newNode == null) {
@@ -146,11 +145,14 @@ private class BookTrie {
 class SearchResult(books: List<Book> = emptyList()) {
     val authorsBooks = mutableSetOf<Book>()
     val titleBooks = mutableSetOf<Book>()
+    val categoryBooks = mutableSetOf<Book>()
     init {
         titleBooks.addAll(books)
+        authorsBooks.addAll(books)
+        categoryBooks.addAll(books)
     }
     override fun toString(): String {
-        return "$authorsBooks $titleBooks"
+        return "Author books: ${authorsBooks.size} Title books: ${titleBooks.size} Category Books: ${categoryBooks.size}"
     }
 }
 
