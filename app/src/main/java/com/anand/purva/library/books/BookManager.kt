@@ -117,7 +117,7 @@ private class BookTrie {
         mode: Mode
     ): BookTrieNode? {
         if (k == key.length) {
-            return null
+            return node
         }
         val currChar = key[k]
         var newNode: BookTrieNode? = node

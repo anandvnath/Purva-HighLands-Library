@@ -19,13 +19,13 @@ class BookViewModel(application: Application) : ViewModel() {
         }
     }
 
-    fun onQuery(query: String) {
+    fun onQuery(query: String?) {
         viewModelScope.launch {
-            if (query.length > 2) {
+            if (query == null || query.length < 3) {
+                searchResult.postValue(bookManager.allBooks)
+            } else {
                 val result = bookManager.search(query)
                 searchResult.postValue(result)
-            } else {
-                searchResult.postValue(bookManager.allBooks)
             }
         }
     }

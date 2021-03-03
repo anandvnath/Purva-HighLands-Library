@@ -36,8 +36,6 @@ class MainActivity : AppCompatActivity() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 Log.d("LibApp", "onQueryTextChange query: $newText")
-                if (newText == null || newText.isBlank())
-                    return false
                 viewModel.onQuery(newText)
                 return false
             }
