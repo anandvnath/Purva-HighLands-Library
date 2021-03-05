@@ -34,7 +34,30 @@ class BookManager(
         }
     }
 
-    suspend fun search(query: String): SearchResult = trie.search(query)
+    suspend fun search(query: String): SearchResult {
+        val list = mutableListOf<SearchResult>()
+        query.trim().split(" ").forEach {
+            list.add(trie.search(it))
+        }
+        val result = SearchResult()
+        result.authorsBooks.addAll(list[0].authorsBooks)
+        result.categoryBooks.addAll(list[0].categoryBooks)
+        result.titleBooks.addAll(list[0].titleBooks)
+        list.forEach {
+            var books = result.authorsBooks.intersect(it.authorsBooks)
+            result.authorsBooks.clear()
+            result.authorsBooks.addAll(books)
+
+            books = result.titleBooks.intersect(it.titleBooks)
+            result.titleBooks.clear()
+            result.titleBooks.addAll(books)
+
+            books = result.categoryBooks.intersect(it.categoryBooks)
+            result.categoryBooks.clear()
+            result.categoryBooks.addAll(books)
+        }
+        return result
+    }
 
     private fun loadBooks() {
         val bufferedReader = application.assets.open(BOOK_CSV_STORE).bufferedReader()
