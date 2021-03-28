@@ -12,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.anand.purva.highlands.library.R
+import com.anand.purva.highlands.library.books.data.SearchResult
 import com.anand.purva.highlands.library.databinding.FragmentSearchResultBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 

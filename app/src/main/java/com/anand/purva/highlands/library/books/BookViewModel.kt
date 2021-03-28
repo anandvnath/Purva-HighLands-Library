@@ -3,6 +3,8 @@ package com.anand.purva.highlands.library.books
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.anand.purva.highlands.library.books.data.IBookManager
+import com.anand.purva.highlands.library.books.data.SearchResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

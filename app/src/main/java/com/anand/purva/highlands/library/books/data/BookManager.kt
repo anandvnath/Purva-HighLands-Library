@@ -1,4 +1,4 @@
-package com.anand.purva.highlands.library.books
+package com.anand.purva.highlands.library.books.data
 
 import android.app.Application
 import android.util.Log
@@ -29,7 +29,8 @@ class BookManager @Inject constructor(
         scope.launch(Dispatchers.Main) {
             loadBooks()
             books.forEach { trie.insert(it) }
-            allBooks = SearchResult(books)
+            allBooks =
+                SearchResult(books)
             callback(true)
         }
     }
@@ -83,9 +84,15 @@ private class BookTrie {
     private var root: BookTrieNode? = null
 
     fun insert(book: Book) {
-        insert(book.title, book, Mode.TITLE)
-        insert(book.author, book, Mode.AUTHOR)
-        insert(book.category, book, Mode.CATEGORY)
+        insert(book.title, book,
+            Mode.TITLE
+        )
+        insert(book.author, book,
+            Mode.AUTHOR
+        )
+        insert(book.category, book,
+            Mode.CATEGORY
+        )
     }
 
     private fun insert(subject: String, book: Book, mode: Mode) {
@@ -145,7 +152,9 @@ private class BookTrie {
         val currChar = key[k]
         var newNode: BookTrieNode? = node
         if (newNode == null) {
-            newNode = BookTrieNode(currChar)
+            newNode = BookTrieNode(
+                currChar
+            )
         }
 
         if (currChar < newNode.character)
@@ -207,5 +216,6 @@ private class BookTrieNode(val character: Char) {
     var left: BookTrieNode? = null
     var right: BookTrieNode? = null
     var middle: BookTrieNode? = null
-    val searchResult = SearchResult()
+    val searchResult =
+        SearchResult()
 }

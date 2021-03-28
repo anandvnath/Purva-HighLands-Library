@@ -4,8 +4,8 @@
 
 package com.anand.purva.highlands.library.di
 
-import com.anand.purva.highlands.library.books.BookManager
-import com.anand.purva.highlands.library.books.IBookManager
+import com.anand.purva.highlands.library.books.data.BookManager
+import com.anand.purva.highlands.library.books.data.IBookManager
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

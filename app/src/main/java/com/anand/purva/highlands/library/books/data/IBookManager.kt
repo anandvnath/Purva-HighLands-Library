@@ -2,7 +2,7 @@
  * Copyright © Microsoft Corporation. All rights reserved.
  */
 
-package com.anand.purva.highlands.library.books
+package com.anand.purva.highlands.library.books.data
 
 import kotlinx.coroutines.CoroutineScope
 
