@@ -3,7 +3,6 @@ package com.anand.purva.highlands.library.books
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.anand.purva.highlands.library.BookItemViewHolder
 import com.anand.purva.highlands.library.R
 import com.anand.purva.highlands.library.books.data.Book
 

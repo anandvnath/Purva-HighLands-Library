@@ -26,6 +26,8 @@ class PHLMainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_main, menu)
         var menuItem = menu.findItem(R.id.search)
         var searchView = menuItem.actionView as SearchView
+        searchView.isIconified = false
+        searchView.isIconifiedByDefault = false
         searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false

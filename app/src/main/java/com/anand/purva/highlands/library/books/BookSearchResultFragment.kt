@@ -73,7 +73,6 @@ class BookSearchResultFragment : Fragment() {
         return 0;
     }
 
-
     private fun displayResults(@IdRes selection: Int) {
         searchResult?.let {
             when (selection) {
