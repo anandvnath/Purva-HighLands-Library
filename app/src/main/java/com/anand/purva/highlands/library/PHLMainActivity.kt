@@ -4,21 +4,19 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.widget.SearchView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.anand.purva.highlands.library.books.BookViewModel
-import com.anand.purva.highlands.library.books.BookViewModelFactory
 import com.anand.purva.highlands.library.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PHLMainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModelFactory: BookViewModelFactory
-    private lateinit var viewModel: BookViewModel
+    private val viewModel: BookViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModelFactory = BookViewModelFactory(application)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(BookViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)

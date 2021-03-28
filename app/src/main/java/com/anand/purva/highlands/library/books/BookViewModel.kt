@@ -1,18 +1,21 @@
 package com.anand.purva.highlands.library.books
 
-import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BookViewModel(application: Application) : ViewModel() {
+@HiltViewModel
+class BookViewModel @Inject constructor(private val bookManager: IBookManager) : ViewModel() {
     val searchResult = MutableLiveData<SearchResult>()
-    val bookManager = BookManager(viewModelScope, application, this::callback)
 
-    private fun callback(done: Boolean) {
-        if (done) {
-            searchResult.postValue(bookManager.allBooks)
+    init {
+        bookManager.initialize(viewModelScope) {done ->
+            if (done) {
+                searchResult.postValue(bookManager.allBooks)
+            }
         }
     }
 

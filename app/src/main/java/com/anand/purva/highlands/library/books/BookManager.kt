@@ -6,14 +6,15 @@ import de.siegmar.fastcsv.reader.CsvReader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class BookManager(
-    scope: CoroutineScope,
-    private val application: Application,
-    callback: (b: Boolean) -> Unit
-) {
+@Singleton
+class BookManager @Inject constructor(
+    private val application: Application
+): IBookManager {
     private val books = mutableListOf<Book>()
-    lateinit var allBooks: SearchResult
+    override lateinit var allBooks: SearchResult
     private val trie = BookTrie()
 
     companion object {
@@ -24,7 +25,7 @@ class BookManager(
         const val CATEGORY_INDEX = 3
     }
 
-    init {
+    override fun initialize(scope: CoroutineScope, callback: (b: Boolean) -> Unit) {
         scope.launch(Dispatchers.Main) {
             loadBooks()
             books.forEach { trie.insert(it) }
@@ -33,7 +34,7 @@ class BookManager(
         }
     }
 
-    suspend fun search(query: String): SearchResult {
+    override suspend fun search(query: String): SearchResult {
         val list = mutableListOf<SearchResult>()
         query.trim().split(" ").forEach {
             list.add(trie.search(it))
