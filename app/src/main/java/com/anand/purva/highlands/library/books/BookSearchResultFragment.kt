@@ -1,4 +1,4 @@
-package com.anand.purva.library.books
+package com.anand.purva.highlands.library.books
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,11 +9,10 @@ import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.core.view.iterator
 import androidx.fragment.app.activityViewModels
-import com.anand.purva.library.R
-import com.anand.purva.library.databinding.FragmentSearchResultBinding
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
+import com.anand.purva.highlands.library.R
+import com.anand.purva.highlands.library.databinding.FragmentSearchResultBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 /**

@@ -1,12 +1,10 @@
-package com.anand.purva.library.books
+package com.anand.purva.highlands.library.books
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.anand.purva.library.BookItemViewHolder
-import com.anand.purva.library.R
+import com.anand.purva.highlands.library.BookItemViewHolder
+import com.anand.purva.highlands.library.R
 
 class BookViewAdapter : RecyclerView.Adapter<BookItemViewHolder>() {
     var data = listOf<Book>()

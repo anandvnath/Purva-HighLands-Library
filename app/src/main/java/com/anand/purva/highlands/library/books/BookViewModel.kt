@@ -1,12 +1,9 @@
-package com.anand.purva.library.books
+package com.anand.purva.highlands.library.books
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.anand.purva.library.books.BookManager
-import com.anand.purva.library.books.SearchResult
 import kotlinx.coroutines.launch
 
 class BookViewModel(application: Application) : ViewModel() {

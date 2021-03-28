@@ -1,17 +1,16 @@
-package com.anand.purva.library
+package com.anand.purva.highlands.library
 
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.widget.SearchView
-import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.anand.purva.library.databinding.ActivityMainBinding
-import com.anand.purva.library.books.BookViewModel
-import com.anand.purva.library.books.BookViewModelFactory
+import com.anand.purva.highlands.library.books.BookViewModel
+import com.anand.purva.highlands.library.books.BookViewModelFactory
+import com.anand.purva.highlands.library.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class PHLMainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModelFactory: BookViewModelFactory
     private lateinit var viewModel: BookViewModel

@@ -1,4 +1,4 @@
-package com.anand.purva.library.books
+package com.anand.purva.highlands.library.books
 
 import android.app.Application
 import androidx.lifecycle.ViewModel

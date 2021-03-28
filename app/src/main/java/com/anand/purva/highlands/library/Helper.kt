@@ -1,4 +1,4 @@
-package com.anand.purva.library
+package com.anand.purva.highlands.library
 
 import android.view.View
 import android.widget.TextView
