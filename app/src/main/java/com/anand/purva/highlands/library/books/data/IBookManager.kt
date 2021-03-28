@@ -1,13 +1,8 @@
-/*
- * Copyright © Microsoft Corporation. All rights reserved.
- */
-
 package com.anand.purva.highlands.library.books.data
 
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 
 interface IBookManager {
-    val allBooks: SearchResult
-    fun initialize(scope: CoroutineScope, callback: (b: Boolean) -> Unit)
-    suspend fun search(query: String): SearchResult
+    fun initialize(): Flow<SearchResult>
+    fun search(query: String): SearchResult
 }

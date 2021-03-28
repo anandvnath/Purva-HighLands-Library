@@ -3,48 +3,40 @@ package com.anand.purva.highlands.library.books.data
 import android.app.Application
 import android.util.Log
 import de.siegmar.fastcsv.reader.CsvReader
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class BookManager @Inject constructor(
-    private val application: Application
+    private val application: Application,
+    private val trie: IBookTrie
 ): IBookManager {
     private val books = mutableListOf<Book>()
-    override lateinit var allBooks: SearchResult
-    private val trie = BookTrie()
 
-    companion object {
-        const val BOOK_CSV_STORE = "LibCatMaster-v0.01.csv"
-        const val ID_INDEX = 0
-        const val TITLE_INDEX = 1
-        const val AUTHOR_INDEX = 2
-        const val CATEGORY_INDEX = 3
-    }
-
-    override fun initialize(scope: CoroutineScope, callback: (b: Boolean) -> Unit) {
-        scope.launch(Dispatchers.Main) {
+    override fun initialize(): Flow<SearchResult> {
+        return flow {
             loadBooks()
             books.forEach { trie.insert(it) }
-            allBooks =
-                SearchResult(books)
-            callback(true)
+            emit(SearchResult(books))
         }
     }
 
-    override suspend fun search(query: String): SearchResult {
-        val list = mutableListOf<SearchResult>()
+    override fun search(query: String): SearchResult {
+        val results = mutableListOf<SearchResult>()
         query.trim().split(" ").forEach {
-            list.add(trie.search(it))
+            results.add(trie.search(it))
         }
+        return mergeResults(results)
+    }
+
+    private fun mergeResults(results: List<SearchResult>): SearchResult {
         val result = SearchResult()
-        result.authorsBooks.addAll(list[0].authorsBooks)
-        result.categoryBooks.addAll(list[0].categoryBooks)
-        result.titleBooks.addAll(list[0].titleBooks)
-        list.forEach {
+        result.authorsBooks.addAll(results[0].authorsBooks)
+        result.categoryBooks.addAll(results[0].categoryBooks)
+        result.titleBooks.addAll(results[0].titleBooks)
+        results.forEach {
             var books = result.authorsBooks.intersect(it.authorsBooks)
             result.authorsBooks.clear()
             result.authorsBooks.addAll(books)
@@ -74,148 +66,12 @@ class BookManager @Inject constructor(
         }
         Log.d("LibApp", "Books loaded: ${books.size}")
     }
-}
 
-private enum class Mode {
-    AUTHOR, TITLE, CATEGORY
-}
-
-private class BookTrie {
-    private var root: BookTrieNode? = null
-
-    fun insert(book: Book) {
-        insert(book.title, book,
-            Mode.TITLE
-        )
-        insert(book.author, book,
-            Mode.AUTHOR
-        )
-        insert(book.category, book,
-            Mode.CATEGORY
-        )
+    companion object {
+        const val BOOK_CSV_STORE = "LibCatMaster-v0.01.csv"
+        const val ID_INDEX = 0
+        const val TITLE_INDEX = 1
+        const val AUTHOR_INDEX = 2
+        const val CATEGORY_INDEX = 3
     }
-
-    private fun insert(subject: String, book: Book, mode: Mode) {
-        subject.split(" ").forEach {
-            val key = it.trim().toLowerCase()
-            val d = findNextAlphabetLocation(key, 0)
-            if (d < key.length) {
-                root = insert(
-                    root,
-                    key,
-                    book,
-                    d,
-                    mode
-                )
-            }
-        }
-    }
-
-    fun search(query: String): SearchResult {
-        val key = query.toLowerCase()
-        val k = findNextAlphabetLocation(key, 0)
-        val result = search(key, root, k)
-        Log.d("LibApp", "Result: ${result.titleBooks.size} and ${result.authorsBooks.size}")
-        return result
-    }
-
-    private fun search(
-        query: String,
-        node: BookTrieNode?,
-        k: Int
-    ): SearchResult {
-        if (node == null || k == query.length)
-            return SearchResult()
-
-        val currChar = query[k]
-        if (currChar > node.character) {
-            return search(query, node.right, k)
-        } else if (currChar < node.character) {
-            return search(query, node.left, k)
-        }
-
-        if (k == query.length - 1)
-            return node.searchResult
-        return search(query, node.middle, findNextAlphabetLocation(query, k + 1))
-    }
-
-    private fun insert(
-        node: BookTrieNode?,
-        key: String,
-        book: Book,
-        k: Int,
-        mode: Mode
-    ): BookTrieNode? {
-        if (k == key.length) {
-            return node
-        }
-        val currChar = key[k]
-        var newNode: BookTrieNode? = node
-        if (newNode == null) {
-            newNode = BookTrieNode(
-                currChar
-            )
-        }
-
-        if (currChar < newNode.character)
-            newNode.left = insert(newNode.left, key, book, k, mode)
-        else if (currChar > newNode.character)
-            newNode.right = insert(newNode.right, key, book, k, mode)
-        else {
-            insertBookNodeSearchResult(mode, newNode, book)
-            if (k < key.length - 1)
-                newNode.middle =
-                    insert(newNode.middle, key, book, findNextAlphabetLocation(key, k + 1), mode)
-        }
-
-        return newNode
-    }
-
-    private fun insertBookNodeSearchResult(
-        mode: Mode,
-        newNode: BookTrieNode,
-        book: Book
-    ) {
-        when (mode) {
-            Mode.AUTHOR -> newNode.searchResult.authorsBooks.add(book)
-            Mode.TITLE -> newNode.searchResult.titleBooks.add(book)
-            Mode.CATEGORY -> newNode.searchResult.categoryBooks.add(book)
-        }
-    }
-
-    private fun findNextAlphabetLocation(word: String, startIndex: Int): Int {
-        if (startIndex == word.length)
-            return startIndex
-
-        var c = word[startIndex]
-        if (c in 'a'..'z')
-            return startIndex
-        else
-            return findNextAlphabetLocation(word, startIndex + 1)
-    }
-
-}
-
-class SearchResult(books: List<Book> = emptyList()) {
-    val authorsBooks = mutableSetOf<Book>()
-    val titleBooks = mutableSetOf<Book>()
-    val categoryBooks = mutableSetOf<Book>()
-
-    init {
-        titleBooks.addAll(books)
-        authorsBooks.addAll(books)
-        categoryBooks.addAll(books)
-    }
-
-    override fun toString(): String {
-        return "Author books: ${authorsBooks.size} Title books: ${titleBooks.size} Category Books: ${categoryBooks.size}"
-    }
-}
-
-private class BookTrieNode(val character: Char) {
-    var left: BookTrieNode? = null
-    var right: BookTrieNode? = null
-    var middle: BookTrieNode? = null
-    val searchResult =
-        SearchResult()
 }

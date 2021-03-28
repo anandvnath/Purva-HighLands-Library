@@ -6,17 +6,19 @@ import androidx.lifecycle.viewModelScope
 import com.anand.purva.highlands.library.books.data.IBookManager
 import com.anand.purva.highlands.library.books.data.SearchResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class BookViewModel @Inject constructor(private val bookManager: IBookManager) : ViewModel() {
     val searchResult = MutableLiveData<SearchResult>()
+    private val allBooksResultFlow = bookManager.initialize()
 
     init {
-        bookManager.initialize(viewModelScope) {done ->
-            if (done) {
-                searchResult.postValue(bookManager.allBooks)
+        viewModelScope.launch {
+            allBooksResultFlow.collect {
+                searchResult.postValue(it)
             }
         }
     }
@@ -24,7 +26,9 @@ class BookViewModel @Inject constructor(private val bookManager: IBookManager) :
     fun onQuery(query: String?) {
         viewModelScope.launch {
             if (query == null || query.length < 3) {
-                searchResult.postValue(bookManager.allBooks)
+                allBooksResultFlow.collect {
+                    searchResult.postValue(it)
+                }
             } else {
                 val result = bookManager.search(query)
                 searchResult.postValue(result)
