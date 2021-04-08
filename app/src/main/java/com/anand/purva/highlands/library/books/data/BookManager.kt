@@ -68,7 +68,7 @@ class BookManager @Inject constructor(
     }
 
     companion object {
-        const val BOOK_CSV_STORE = "LibCatMaster-v0.01.csv"
+        const val BOOK_CSV_STORE = "LibCatMaster-v0.0.1.csv"
         const val ID_INDEX = 0
         const val TITLE_INDEX = 1
         const val AUTHOR_INDEX = 2
