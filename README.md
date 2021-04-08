@@ -7,4 +7,5 @@ This app uses a CSV file as a books store and implements search functionality ac
 1. Implements a Trie to search across multiple fields of a book
 1. Uses Hilt as DI
 1. Uses ViewBindings Jetpack
-1. Uses recycler view to display search result
+1. Uses recycler view and card view to display search results
+1. Uses Flow and LiveData to transfer data into UI
