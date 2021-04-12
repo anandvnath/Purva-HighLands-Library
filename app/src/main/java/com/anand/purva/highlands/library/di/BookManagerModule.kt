@@ -5,6 +5,8 @@
 package com.anand.purva.highlands.library.di
 
 import com.anand.purva.highlands.library.books.data.*
+import com.anand.purva.highlands.library.books.data.repository.BookRepository
+import com.anand.purva.highlands.library.books.data.repository.IBookRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

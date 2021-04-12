@@ -1,5 +1,6 @@
 package com.anand.purva.highlands.library.books.data
 
+import com.anand.purva.highlands.library.books.data.repository.IBookRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -13,9 +14,10 @@ class BookManager @Inject constructor(
 ): IBookManager {
     override fun initialize(): Flow<SearchResult> {
         return flow {
-            repo.loadBooks().collect { it ->
-                it.forEach { trie.insert(it) }
-                emit(SearchResult(it))
+            repo.loadBooks().collect { books ->
+                trie.clear()
+                books.forEach { trie.insert(it) }
+                emit(SearchResult(books))
             }
         }
     }

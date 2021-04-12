@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Purva Highlands Library</string>
+    <string name="pref_name">com.anand.purva.library.preferences</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>

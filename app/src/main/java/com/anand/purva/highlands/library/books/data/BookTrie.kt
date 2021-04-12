@@ -22,6 +22,10 @@ class BookTrie @Inject constructor(): IBookTrie {
         return result
     }
 
+    override fun clear() {
+        root = null
+    }
+
     private fun insert(subject: String, book: Book, bookAttribute: BookAttribute) {
         subject.split(" ").forEach {
             val key = it.trim().toLowerCase()
