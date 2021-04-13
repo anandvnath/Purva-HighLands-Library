@@ -29,14 +29,14 @@ class BookRepository @Inject constructor(
         return flow {
             val sharedPref = application.getSharedPreferences(application.getString(R.string.pref_name), Context.MODE_PRIVATE)
             sharedPref.getString(DOWNLOADED_CATALOG_PATH, null)?.let { downloadPath ->
-                Log.d(TAG, "Found an existing catalog download at $downloadPath. Proceeding to check time since last sync.")
+                Log.d(TAG, "Found an existing catalog download at $downloadPath. Emitting this and then proceeding to check time since last sync.")
+                emit(loadBooksFromDownload(downloadPath))
                 val downloadedCatalogTime = sharedPref.getLong(DOWNLOADED_CATALOG_TIME, 0)
                 if ((System.currentTimeMillis() - downloadedCatalogTime) > DAY_IN_MILLIS) {
                     Log.d(TAG, "Time since last sync exceeded 24hrs. Loading from network.")
-                    loadBooksFromNetwork(sharedPref, downloadPath)?.let { emit(it) }
+                    loadBooksFromNetwork(sharedPref)?.let { emit(it) }
                 } else {
-                    Log.d(TAG, "Time since last sync still under 24hrs. Returning downloaded catalog from $downloadPath.")
-                    emit(loadBooksFromDownload(downloadPath))
+                    Log.d(TAG, "Time since last sync less than 24hrs. Not loading from network.")
                 }
                 return@flow
             }
@@ -44,36 +44,32 @@ class BookRepository @Inject constructor(
             Log.d(TAG, "No previously saved catalog found. Serving from packaged catalog.")
             emit(loadBooksFromAssets())
             Log.d(TAG, "Proceeding to load catalog from network.")
-            loadBooksFromNetwork(sharedPref, null)?.let { emit(it) }
+            loadBooksFromNetwork(sharedPref)?.let { emit(it) }
         }
     }
 
-    private suspend fun loadBooksFromNetwork(sharedPref: SharedPreferences, downloadedCatalogPath: String?): List<Book>? {
-        Log.d(TAG, "Downloading latest catalog...")
+    private suspend fun loadBooksFromNetwork(sharedPref: SharedPreferences): List<Book>? {
         val downloadedCatalogVersion = sharedPref.getString(DOWNLOADED_CATALOG_VERSION, null)
         val latestCatalogVersion = retrofitServiceBuilder.bookCatalogService.getLatestVersion()
+        if (latestCatalogVersion.version == downloadedCatalogVersion) {
+            Log.d(TAG, "No new version of catalog found.")
+            return null
+        }
 
-        if (latestCatalogVersion.version != downloadedCatalogVersion) {
-            Log.d(TAG, "Newer version of catalog '${latestCatalogVersion.version}' available. Existing '$downloadedCatalogVersion'")
-            val responseBody = retrofitServiceBuilder.bookCatalogService.downloadFile(latestCatalogVersion.version).body()
-            val fileName = application.filesDir.absolutePath + File.separator + BOOK_CSV_STORE
-            saveFile(responseBody, fileName)?.let { file ->
-                Log.d(TAG, "Download successful to file $file")
-                with(sharedPref.edit()) {
-                    putLong(DOWNLOADED_CATALOG_TIME, System.currentTimeMillis())
-                    putString(DOWNLOADED_CATALOG_VERSION, latestCatalogVersion.version)
-                    putString(DOWNLOADED_CATALOG_PATH, file)
-                    apply()
-                }
-                return loadBooksFromDownload(file)
+        Log.d(TAG, "Newer version of catalog '${latestCatalogVersion.version}' available. Existing '$downloadedCatalogVersion'")
+        val responseBody = retrofitServiceBuilder.bookCatalogService.downloadFile(latestCatalogVersion.version).body()
+        val fileName = application.filesDir.absolutePath + File.separator + BOOK_CSV_STORE
+        saveFile(responseBody, fileName)?.let { file ->
+            Log.d(TAG, "Download successful to file $file")
+            with(sharedPref.edit()) {
+                putLong(DOWNLOADED_CATALOG_TIME, System.currentTimeMillis())
+                putString(DOWNLOADED_CATALOG_VERSION, latestCatalogVersion.version)
+                putString(DOWNLOADED_CATALOG_PATH, file)
+                apply()
             }
+            return loadBooksFromDownload(file)
         }
-
-        return downloadedCatalogPath?.let { path ->
-            Log.d(TAG, "New version download may have been unsuccessful.")
-            Log.d(TAG, "Processing version of catalog '${latestCatalogVersion.version}' that is already available.")
-            loadBooksFromDownload(path)
-        }
+        return null
     }
 
     private fun loadBooksFromDownload(downloadedCatalogPath: String) =
