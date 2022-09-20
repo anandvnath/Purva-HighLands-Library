@@ -1,2 +1,2 @@
-include ':app'
+include ':app-v1'
 rootProject.name = "Purva Library"
